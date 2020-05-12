@@ -2,6 +2,7 @@ package it.polito.tdp.anagramma.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Ricerca {
 	
@@ -13,60 +14,58 @@ public class Ricerca {
 	 * @return elenco di tutti gli anagrammi della parola data
 	 */
 	public List<String> anagrammi(String parola) {
-		this.soluzione = new ArrayList<>() ;
+		this.soluzione = new ArrayList<>();
 		
-		parola=parola.toUpperCase() ;
-		
-		List<Character> disponibili = new ArrayList<>() ;
+		//all'inizio si troverà così la ricorsione
+		parola = parola.toUpperCase();	//per evitare problemi
+		List<Character> disponibili = new ArrayList<>();
 		for(int i=0; i<parola.length(); i++) {
-			disponibili.add(parola.charAt(i)) ;
+			disponibili.add(parola.charAt(i));
 		}
+		//avvio ricorsione: preparazione delle variabili in via della ricorsione stessa
+		cerca("", 0, disponibili);
 		
-		// avvia la ricorsione
-		cerca("", 0, disponibili) ; 
-		
-		return this.soluzione ;
+		return this.soluzione;
 	}
 	
-	/**
-	 * Procedura ricorsiva per il calcolo dell'anagramma.
-	 * 
-	 * @param parziale parte iniziale dell'anagramma costruito finora
-	 * @param livello livello della ricorsione, sempre uguale a parziale.length()
-	 * @param disponibili insieme delle lettere non ancora utilizzate
-	 */
-	private void cerca( String parziale, int livello, List<Character> disponibili) {
-		if(disponibili.size()==0) { // livello==parola.length()
-			// caso terminale
-			
-			// if(parziale è nel dizionario)
-			// if( parziale non è presente nella soluzione )
-			this.soluzione.add(parziale) ;
+	//Procedura ricorsiva
+	//l'ambiente dove i parametri sono gia creati si ricavano del metodo privato cerca
+		//parziale: partre dell'anagramma scritto finora
+		//livello: livello della ricorsione, sempre uguale alla lunghezza della parziale
+		//disponibili: insieme di caratteri non ancora utilizzati
+	private void cerca(String parziale, int livello, List<Character> disponibili) {
+		if(disponibili.size()==0) {
+			//caso terminale: il livello è uguale alla lunghezza della parola dad cercare || quando non c'è nessuna lettera da aggiungere
+			//if(parziale è nel dizionario allora la stampo) altrimenti la scarto
+			//if parziale non è prenìsente nella soluzione eseguo, altrimenti non la inserisco di nuovo
+			this.soluzione.add(parziale);
 		}
-		
-		// caso normale
-		// provare ad aggiungere a 'parziale' tutti i caratteri presenti tra
-		// i 'disponibili'
+		//caso normale: provare ad aggiungere alla soluzione parziale tutti i carrateri presenti tra i disponibili
 		for(Character ch: disponibili) {
-			String tentativo = parziale + ch ;
+			//if(nel dizionario esistono parole = tentativo)
+				//eseguo
+			//else
+				//esco perchè è inutile fare una funzione se non esiste la parola
+			//nuova stringa in cui aggiungo alla stringa parziale un carattere disponibile (non uso il backtracking perchè non modifico la stringa parziale)
+			String tentativo = parziale + ch;
 			
-//			if(nel dizionario esistono delle parole che iniziano con 'tentativo'?)
+			//dato che sto iterando dentro disponibili, non posso rimuovere il carattere aggiunto direttamente dalla lista disponibili
+			//faccio una copia della lista per poter rimuovere la lettera da lì
+			List<Character> rimanenti = new ArrayList<Character>(disponibili);
+			rimanenti.remove(ch);
 			
-			List<Character> rimanenti = new ArrayList<>(disponibili) ;
-			rimanenti.remove(ch) ;
-			
-			cerca( tentativo, livello+1, rimanenti) ;
+			cerca(tentativo, livello+1, rimanenti);
 		}
 	}
+	
 
+/*DATO DI PARTENZA: parola di lunghezza N
+ * Domande:
+ * 1- cos'è la soluzione parziale?	parte dell'anagramma gia costruito (i primi caratteri: dalla prima lettera in avanti)
+ * il livello mi indica il numero di lettere di cui è composta la parola
+ * SOLUZIONE FINALE: soluzione di lunghezza N--> sono nel caso terminale: salvo la soluzione trovata per poterla poi restituire
+ * DENTRO LA RICORSIONE: ho una soluzione parziale devo generare una nuova soluzione con una lettera in piu, scegliendola
+ * 	tra quelle non ancora utilizzate nella soluzione parziale
+ * 
+ * */
 }
-
-/*
-Dato di partenza: parola da anagrammare, di lunghezza N
-Soluzione parziale: una parte dell'anagramma già costruito (i primi caratteri).
-Livello: numero di lettere di cui è composta la soluzione parziale.
-Soluzione finale: soluzione di lunghezza N -> caso terminale
-Caso terminale: salvare la soluzione trovate
-Generazione delle nuove soluzioni: provare a aggiungere una lettera, scegliendola
-tra quelle che non sono ancora state utilizzate (nella soluzione parziale).
-*/
